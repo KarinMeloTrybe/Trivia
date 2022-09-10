@@ -1,15 +1,24 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import md5 from 'crypto-js/md5';
 import { getTokenFromAPI } from '../redux/actions/tokens';
 import { saveToLocalStorage } from '../service/localStorage';
 import getFromAPI from '../service/getFromAPI';
+import { getAvatarImage, loginActions } from '../redux/actions/Player';
 
 class Login extends Component {
   state = {
     name: '',
     email: '',
     isDisable: true,
+  };
+
+  getAvatar = () => {
+    const { email } = this.state;
+    const { dispatch } = this.props;
+    const convertedEmail = md5(email).toString();
+    dispatch(getAvatarImage(convertedEmail));
   };
 
   handleValidation = () => {
@@ -33,8 +42,11 @@ class Login extends Component {
   handleClick = async () => {
     const token = await getFromAPI();
     const { dispatch, history } = this.props;
+    const { name, email } = this.state;
     dispatch(getTokenFromAPI());
     saveToLocalStorage(token);
+    loginActions({ name, email });
+    this.getAvatar();
     history.push('/game');
   };
 

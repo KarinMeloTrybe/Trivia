@@ -3,7 +3,6 @@ import { CHANGE_SCORE, CHANGE_LOGIN, CHANGE_IMAGE } from '../actions/Player';
 const INITIAL_STATE = {
   score: 0,
   name: '',
-  avatarImage: '',
   email: '',
 };
 const playerReducer = (state = INITIAL_STATE, action) => {

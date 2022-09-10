@@ -16,7 +16,7 @@ const playerReducer = (state = INITIAL_STATE, action) => {
   case CHANGE_LOGIN:
     return {
       ...state,
-      namePlayer: action.login.name,
+      name: action.login.name,
       email: action.login.email,
     };
   case CHANGE_IMAGE:

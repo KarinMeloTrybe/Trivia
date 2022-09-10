@@ -18,6 +18,7 @@ class Login extends Component {
     const { email } = this.state;
     const { dispatch } = this.props;
     const convertedEmail = md5(email).toString();
+    console.log(convertedEmail);
     dispatch(getAvatarImage(convertedEmail));
   };
 
@@ -45,7 +46,7 @@ class Login extends Component {
     const { name, email } = this.state;
     dispatch(getTokenFromAPI());
     saveToLocalStorage(token);
-    loginActions({ name, email });
+    dispatch(loginActions({ name, email }));
     this.getAvatar();
     history.push('/game');
   };

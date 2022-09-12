@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { getTokenFromAPI } from '../redux/actions/tokens';
 import { saveToLocalStorage } from '../service/localStorage';
 import getFromAPI from '../service/getFromAPI';
+import { loginActions } from '../redux/actions/Player';
 
 class Login extends Component {
   state = {
@@ -33,8 +34,10 @@ class Login extends Component {
   handleClick = async () => {
     const token = await getFromAPI();
     const { dispatch, history } = this.props;
+    const { name, email } = this.state;
     dispatch(getTokenFromAPI());
     saveToLocalStorage(token);
+    dispatch(loginActions({ name, email }));
     history.push('/game');
   };
 

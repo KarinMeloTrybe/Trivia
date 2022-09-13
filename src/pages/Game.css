@@ -1,19 +1,7 @@
-.color-answers #correct-answer {
+.color-answers .correct-answer {
   border: 3px solid rgb(6, 240, 15);
 }
 
-.color-answers #wrong-answer-0 {
-  border: 3px solid red;
-}
-
-.color-answers #wrong-answer-1 {
-  border: 3px solid red;
-}
-
-.color-answers #wrong-answer-2 {
-  border: 3px solid red;
-}
-
-.color-answers #wrong-answer-3 {
+.color-answers .wrong-answers {
   border: 3px solid red;
 }

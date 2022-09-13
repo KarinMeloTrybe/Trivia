@@ -67,7 +67,7 @@ class Game extends Component {
         key={ index }
         disabled={ timeOut }
         data-testid={ `wrong-answer-${index}` }
-        id={ `wrong-answer-${index}` }
+        className="wrong-answers"
         onClick={ this.addColorOnClick }
       >
         {answer}
@@ -80,6 +80,7 @@ class Game extends Component {
         type="button"
         data-testid="correct-answer"
         id="correct-answer"
+        className="correct-answer"
         key="3"
         disabled={ timeOut }
         onClick={ this.addColorOnClick }

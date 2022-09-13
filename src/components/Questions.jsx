@@ -1,50 +1,67 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { timeOutUser } from '../redux/actions/Player';
 
-export default class Questions extends Component {
+class Questions extends Component {
+  state = {
+    secondsTimer: 30,
+    timer: '',
+  };
+
+  componentDidMount() {
+    const ONE_SECOND = 1000;
+    const myTimer = setInterval(() => {
+      this.setState((prevState) => ({
+        secondsTimer: prevState.secondsTimer - 1,
+      }));
+    }, ONE_SECOND);
+    this.setState({
+      timer: myTimer,
+    });
+  }
+
+  componentDidUpdate() {
+    const { secondsTimer, timer } = this.state;
+    const { dispatch } = this.props;
+    if (secondsTimer === 0) {
+      clearInterval(timer);
+      dispatch(timeOutUser(true));
+    }
+  }
+
   render() {
-    const { questions } = this.props;
-    let answerOptions = questions.incorrect_answers.map((answer, index) => (
-      <button type="button" key={ index } data-testid={ `wrong-answer-${index}` }>
-        {answer}
-      </button>
-    ));
-
-    answerOptions = [
-      ...answerOptions,
-      <button type="button" data-testid="correct-answer" key="3">
-        {questions.correct_answer}
-      </button>,
-    ];
-
-    const sortValue = 0.5;
-
-    const random = answerOptions.sort(() => Math.random() - sortValue);
+    const { questions, AnswersRandom } = this.props;
+    const { secondsTimer } = this.state;
 
     return (
       <div>
+        <p>{secondsTimer}</p>
         <h3 data-testid="question-category">
           Categoria:
           {questions.category}
         </h3>
-        <h3 data-testid="question-text">
-          {questions.question}
-        </h3>
-        <div data-testid="answer-options">
-          { random }
-        </div>
+        <h3 data-testid="question-text">{questions.question}</h3>
+        <div data-testid="answer-options">{AnswersRandom}</div>
       </div>
     );
   }
 }
+
+const mapStateToProps = (state) => ({
+  isFetching: state.TokenReducer.isFetching,
+  invalidToken: state.TokenReducer.invalidToken,
+});
+
+export default connect(mapStateToProps)(Questions);
 
 Questions.propTypes = {
   questions: PropTypes.shape({
     category: PropTypes.string,
     question: PropTypes.string,
     correct_answer: PropTypes.string,
-    incorrect_answers: PropTypes.arrayOf(
-      PropTypes.string,
-    ).isRequired,
+    incorrect_answers: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
+  AnswersRandom: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  dispatch: PropTypes.func.isRequired,
 };

@@ -1,9 +1,15 @@
-import { CHANGE_SCORE, CHANGE_LOGIN, CHANGE_IMAGE } from '../actions/Player';
+import {
+  CHANGE_SCORE,
+  CHANGE_LOGIN,
+  CHANGE_IMAGE,
+  TIME_OUT_USER,
+} from '../actions/Player';
 
 const INITIAL_STATE = {
   score: 0,
   name: '',
   email: '',
+  time: false,
 };
 const playerReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
@@ -22,6 +28,11 @@ const playerReducer = (state = INITIAL_STATE, action) => {
     return {
       ...state,
       avatarImage: action.getData,
+    };
+  case TIME_OUT_USER:
+    return {
+      ...state,
+      time: action.bool,
     };
   default:
     return state;

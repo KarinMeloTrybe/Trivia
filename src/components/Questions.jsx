@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { timeOutUser } from '../redux/actions/Player';
+import { timeOutUser, remaningResponseTime, idMyTimer } from '../redux/actions/Player';
 
 class Questions extends Component {
   state = {
@@ -10,15 +10,19 @@ class Questions extends Component {
   };
 
   componentDidMount() {
+    const { dispatch } = this.props;
     const ONE_SECOND = 1000;
     const myTimer = setInterval(() => {
+      const { secondsTimer } = this.state;
       this.setState((prevState) => ({
         secondsTimer: prevState.secondsTimer - 1,
       }));
+      dispatch(remaningResponseTime(secondsTimer));
     }, ONE_SECOND);
     this.setState({
       timer: myTimer,
     });
+    dispatch(idMyTimer(myTimer));
   }
 
   componentDidUpdate() {

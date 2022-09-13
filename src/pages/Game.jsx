@@ -10,6 +10,7 @@ import getQuestionsFromAPI from '../service/getQuestionsFromAPI';
 import Header from '../components/Header';
 import Questions from '../components/Questions';
 import './Game.css';
+import { timeOutUser, scoreActions } from '../redux/actions/Player';
 
 class Game extends Component {
   state = {
@@ -47,17 +48,47 @@ class Game extends Component {
   }
 
   addColorOnClick = ({ target }) => {
+    const { dispatch } = this.props;
     const teste = target.parentNode;
     teste.className = 'color-answers';
+    dispatch(scoreActions(this.handleScore(target)));
   };
 
-  // goToNextQuestion = () => {
-  //   this.setState(prevState, () => {
-  //     this.setState({
-  //       actualQuestion: prevState.actualQuestion + 1,
-  //     });
-  //   });
-  // };
+  totalScore = () => {
+    const { questionsGame } = this.state;
+    const easy = 1;
+    const medium = 2;
+    const hard = 3;
+    switch (questionsGame[0].difficulty) {
+    case 'easy':
+      return easy;
+    case 'medium':
+      return medium;
+    case 'hard':
+      return hard;
+    default:
+      return 0;
+    }
+  };
+
+  handleScore = (target) => {
+    const { myTimer, dispatch } = this.props;
+    if (target.id.includes('correct')) {
+      clearInterval(myTimer);
+      const { remaningTime } = this.props;
+      const pointOfDifficulty = this.totalScore();
+      const magicNumber = 10;
+      const actualRemaningTime = Number(remaningTime) - 1;
+      const pointsTotal = Number(
+        magicNumber + ((actualRemaningTime) * (pointOfDifficulty)),
+      );
+      return pointsTotal;
+    }
+    const points = 0;
+    clearInterval(myTimer);
+    dispatch(timeOutUser(true));
+    return points;
+  };
 
   getElementsOfQuestion = async (questions) => {
     const { timeOut } = this.props;
@@ -66,6 +97,7 @@ class Game extends Component {
         type="button"
         key={ index }
         disabled={ timeOut }
+        id={ `wrong-answer-${index}` }
         data-testid={ `wrong-answer-${index}` }
         className="wrong-answers"
         onClick={ this.addColorOnClick }
@@ -133,6 +165,8 @@ const mapStateToProps = (state) => ({
   isFetching: state.TokenReducer.isFetching,
   invalidToken: state.TokenReducer.invalidToken,
   timeOut: state.player.time,
+  myTimer: state.player.myTimer,
+  remaningTime: state.player.remaningTime,
 });
 
 export default connect(mapStateToProps)(Game);
@@ -150,4 +184,6 @@ Game.propTypes = {
   isFetching: PropTypes.bool,
   invalidToken: PropTypes.bool,
   timeOut: PropTypes.bool.isRequired,
+  myTimer: PropTypes.number.isRequired,
+  remaningTime: PropTypes.number.isRequired,
 };

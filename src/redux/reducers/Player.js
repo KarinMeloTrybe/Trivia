@@ -3,6 +3,8 @@ import {
   CHANGE_LOGIN,
   CHANGE_IMAGE,
   TIME_OUT_USER,
+  REMANING_RESPONSE_TIME,
+  ID_MY_TIMER,
 } from '../actions/Player';
 
 const INITIAL_STATE = {
@@ -10,6 +12,8 @@ const INITIAL_STATE = {
   name: '',
   email: '',
   time: false,
+  remaningTime: 0,
+  myTimer: 0,
 };
 const playerReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
@@ -33,6 +37,16 @@ const playerReducer = (state = INITIAL_STATE, action) => {
     return {
       ...state,
       time: action.bool,
+    };
+  case REMANING_RESPONSE_TIME:
+    return {
+      ...state,
+      remaningTime: action.time,
+    };
+  case ID_MY_TIMER:
+    return {
+      ...state,
+      myTimer: action.myTimer,
     };
   default:
     return state;

@@ -9,7 +9,7 @@ class Questions extends Component {
     timer: '',
   };
 
-componentDidMount() {
+  componentDidMount() {
     const { dispatch } = this.props;
     const ONE_SECOND = 1000;
     const myTimer = setInterval(() => {

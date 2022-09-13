@@ -9,6 +9,7 @@ import { isFetchingAction, invalidTokenAction } from '../redux/actions/tokens';
 import getQuestionsFromAPI from '../service/getQuestionsFromAPI';
 import Header from '../components/Header';
 import Questions from '../components/Questions';
+import './Game.css';
 
 class Game extends Component {
   state = {
@@ -40,8 +41,15 @@ class Game extends Component {
   componentDidUpdate(prevProps) {
     const { timeOut } = this.props;
     const { questionsGame } = this.state;
-    if (prevProps.timeOut !== timeOut) this.getElementsOfQuestion(questionsGame);
+    if (prevProps.timeOut !== timeOut) {
+      this.getElementsOfQuestion(questionsGame);
+    }
   }
+
+  addColorOnClick = ({ target }) => {
+    const teste = target.parentNode;
+    teste.className = 'color-answers';
+  };
 
   // goToNextQuestion = () => {
   //   this.setState(prevState, () => {
@@ -53,22 +61,29 @@ class Game extends Component {
 
   getElementsOfQuestion = async (questions) => {
     const { timeOut } = this.props;
-    let answerOptions = questions[0].incorrect_answers.map(
-      (answer, index) => (
-        <button
-          type="button"
-          key={ index }
-          disabled={ timeOut }
-          data-testid={ `wrong-answer-${index}` }
-        >
-          {answer}
-        </button>
-      ),
-    );
+    let answerOptions = questions[0].incorrect_answers.map((answer, index) => (
+      <button
+        type="button"
+        key={ index }
+        disabled={ timeOut }
+        data-testid={ `wrong-answer-${index}` }
+        id={ `wrong-answer-${index}` }
+        onClick={ this.addColorOnClick }
+      >
+        {answer}
+      </button>
+    ));
 
     answerOptions = [
       ...answerOptions,
-      <button type="button" data-testid="correct-answer" key="3" disabled={ timeOut }>
+      <button
+        type="button"
+        data-testid="correct-answer"
+        id="correct-answer"
+        key="3"
+        disabled={ timeOut }
+        onClick={ this.addColorOnClick }
+      >
         {questions[0].correct_answer}
       </button>,
     ];

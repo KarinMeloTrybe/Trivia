@@ -9,11 +9,12 @@ import { isFetchingAction, invalidTokenAction } from '../redux/actions/tokens';
 import getQuestionsFromAPI from '../service/getQuestionsFromAPI';
 import Header from '../components/Header';
 import Questions from '../components/Questions';
+import './Game.css';
 
 class Game extends Component {
   state = {
     questionsGame: [],
-    // actualQuestion: 1,
+    randomAnswers: [],
   };
 
   async componentDidMount() {
@@ -29,8 +30,26 @@ class Game extends Component {
         history.push('/');
       }, timeOfInterval);
     }
-    this.setState({ questionsGame: questions });
+    this.setState({
+      questionsGame: questions,
+    });
+    if (questions.length > 0) {
+      this.getElementsOfQuestion(questions);
+    }
   }
+
+  componentDidUpdate(prevProps) {
+    const { timeOut } = this.props;
+    const { questionsGame } = this.state;
+    if (prevProps.timeOut !== timeOut) {
+      this.getElementsOfQuestion(questionsGame);
+    }
+  }
+
+  addColorOnClick = ({ target }) => {
+    const teste = target.parentNode;
+    teste.className = 'color-answers';
+  };
 
   // goToNextQuestion = () => {
   //   this.setState(prevState, () => {
@@ -40,9 +59,47 @@ class Game extends Component {
   //   });
   // };
 
+  getElementsOfQuestion = async (questions) => {
+    const { timeOut } = this.props;
+    let answerOptions = questions[0].incorrect_answers.map((answer, index) => (
+      <button
+        type="button"
+        key={ index }
+        disabled={ timeOut }
+        data-testid={ `wrong-answer-${index}` }
+        className="wrong-answers"
+        onClick={ this.addColorOnClick }
+      >
+        {answer}
+      </button>
+    ));
+
+    answerOptions = [
+      ...answerOptions,
+      <button
+        type="button"
+        data-testid="correct-answer"
+        id="correct-answer"
+        className="correct-answer"
+        key="3"
+        disabled={ timeOut }
+        onClick={ this.addColorOnClick }
+      >
+        {questions[0].correct_answer}
+      </button>,
+    ];
+
+    const sortValue = 0.5;
+
+    const random = answerOptions.sort(() => Math.random() - sortValue);
+
+    this.setState({ randomAnswers: await random });
+  };
+
   render() {
     const { isFetching, invalidToken } = this.props;
-    const { questionsGame } = this.state;
+    const { questionsGame, randomAnswers } = this.state;
+
     return (
       questionsGame.length !== 0 && (
         <div>
@@ -57,7 +114,10 @@ class Game extends Component {
                 ) : (
                   <div>
                     <Header />
-                    <Questions questions={ questionsGame[0] } />
+                    <Questions
+                      questions={ questionsGame[0] }
+                      AnswersRandom={ randomAnswers }
+                    />
                   </div>
                 )}
               </div>
@@ -72,6 +132,7 @@ class Game extends Component {
 const mapStateToProps = (state) => ({
   isFetching: state.TokenReducer.isFetching,
   invalidToken: state.TokenReducer.invalidToken,
+  timeOut: state.player.time,
 });
 
 export default connect(mapStateToProps)(Game);
@@ -88,4 +149,5 @@ Game.propTypes = {
   }).isRequired,
   isFetching: PropTypes.bool,
   invalidToken: PropTypes.bool,
+  timeOut: PropTypes.bool.isRequired,
 };

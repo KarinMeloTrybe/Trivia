@@ -1,42 +1,15 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { timeOutUser, remaningResponseTime, idMyTimer } from '../redux/actions/Player';
 
 class Questions extends Component {
-  state = {
-    secondsTimer: 30,
-    timer: '',
-  };
-
   componentDidMount() {
-    const { dispatch } = this.props;
-    const ONE_SECOND = 1000;
-    const myTimer = setInterval(() => {
-      const { secondsTimer } = this.state;
-      this.setState((prevState) => ({
-        secondsTimer: prevState.secondsTimer - 1,
-      }));
-      dispatch(remaningResponseTime(secondsTimer));
-    }, ONE_SECOND);
-    this.setState({
-      timer: myTimer,
-    });
-    dispatch(idMyTimer(myTimer));
-  }
-
-  componentDidUpdate() {
-    const { secondsTimer, timer } = this.state;
-    const { dispatch } = this.props;
-    if (secondsTimer === 0) {
-      clearInterval(timer);
-      dispatch(timeOutUser(true));
-    }
+    const { counterTime } = this.props;
+    counterTime();
   }
 
   render() {
-    const { questions, AnswersRandom } = this.props;
-    const { secondsTimer } = this.state;
+    const { questions, AnswersRandom, secondsTimer } = this.props;
 
     return (
       <div>
@@ -55,6 +28,7 @@ class Questions extends Component {
 const mapStateToProps = (state) => ({
   isFetching: state.TokenReducer.isFetching,
   invalidToken: state.TokenReducer.invalidToken,
+  secondsTimer: state.player.secondsTimer,
 });
 
 export default connect(mapStateToProps)(Questions);
@@ -67,5 +41,6 @@ Questions.propTypes = {
     incorrect_answers: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
   AnswersRandom: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  dispatch: PropTypes.func.isRequired,
+  counterTime: PropTypes.func.isRequired,
+  secondsTimer: PropTypes.number.isRequired,
 };

@@ -10,12 +10,16 @@ import getQuestionsFromAPI from '../service/getQuestionsFromAPI';
 import Header from '../components/Header';
 import Questions from '../components/Questions';
 import './Game.css';
-import { timeOutUser, scoreActions } from '../redux/actions/Player';
+import { timeOutUser, scoreActions, restartTimer,
+  remaningResponseTime, idMyTimer, changeTimer } from '../redux/actions/Player';
 
 class Game extends Component {
   state = {
     questionsGame: [],
     randomAnswers: [],
+    actualQuestion: 0,
+    btnVisible: false,
+    timer: '',
   };
 
   async componentDidMount() {
@@ -42,16 +46,56 @@ class Game extends Component {
   componentDidUpdate(prevProps) {
     const { timeOut } = this.props;
     const { questionsGame } = this.state;
+    this.stopTime();
     if (prevProps.timeOut !== timeOut) {
       this.getElementsOfQuestion(questionsGame);
+      this.setState({ btnVisible: true });
     }
   }
+
+  counterTime = () => {
+    const { dispatch, secondsTimer } = this.props;
+    const ONE_SECOND = 1000;
+    const myTimer = setInterval(() => {
+      dispatch(changeTimer());
+      dispatch(remaningResponseTime(secondsTimer));
+    }, ONE_SECOND);
+    this.setState({ timer: myTimer });
+    dispatch(idMyTimer(myTimer));
+  };
+
+  stopTime = () => {
+    const { timer } = this.state;
+    const { dispatch, secondsTimer } = this.props;
+    if (secondsTimer === 0) {
+      clearInterval(timer);
+      dispatch(timeOutUser(true));
+    }
+  };
+
+  goToNextQuestion = ({ target }) => {
+    const { questionsGame } = this.state;
+    const teste = target.parentNode.children[1].children[3];
+    teste.className = '';
+    this.setState((prevState) => ({
+      actualQuestion: prevState.actualQuestion + 1,
+      btnVisible: false,
+    }), () => {
+      const { dispatch } = this.props;
+      dispatch(timeOutUser(false));
+      dispatch(restartTimer());
+      this.getElementsOfQuestion(questionsGame);
+      this.counterTime();
+    });
+  };
 
   addColorOnClick = ({ target }) => {
     const { dispatch } = this.props;
     const teste = target.parentNode;
     teste.className = 'color-answers';
     dispatch(scoreActions(this.handleScore(target)));
+    this.stopTime();
+    this.setState({ btnVisible: true });
   };
 
   totalScore = () => {
@@ -90,21 +134,23 @@ class Game extends Component {
     return points;
   };
 
-  getElementsOfQuestion = async (questions) => {
+  getElementsOfQuestion = (questions) => {
+    const { actualQuestion } = this.state;
     const { timeOut } = this.props;
-    let answerOptions = questions[0].incorrect_answers.map((answer, index) => (
-      <button
-        type="button"
-        key={ index }
-        disabled={ timeOut }
-        id={ `wrong-answer-${index}` }
-        data-testid={ `wrong-answer-${index}` }
-        className="wrong-answers"
-        onClick={ this.addColorOnClick }
-      >
-        {answer}
-      </button>
-    ));
+    let answerOptions = questions[actualQuestion].incorrect_answers
+      .map((answer, index) => (
+        <button
+          type="button"
+          key={ index }
+          disabled={ timeOut }
+          id={ `wrong-answer-${index}` }
+          data-testid={ `wrong-answer-${index}` }
+          className="wrong-answers"
+          onClick={ this.addColorOnClick }
+        >
+          {answer}
+        </button>
+      ));
 
     answerOptions = [
       ...answerOptions,
@@ -117,7 +163,7 @@ class Game extends Component {
         disabled={ timeOut }
         onClick={ this.addColorOnClick }
       >
-        {questions[0].correct_answer}
+        {questions[actualQuestion].correct_answer}
       </button>,
     ];
 
@@ -125,12 +171,12 @@ class Game extends Component {
 
     const random = answerOptions.sort(() => Math.random() - sortValue);
 
-    this.setState({ randomAnswers: await random });
+    this.setState({ randomAnswers: random });
   };
 
   render() {
     const { isFetching, invalidToken } = this.props;
-    const { questionsGame, randomAnswers } = this.state;
+    const { questionsGame, randomAnswers, btnVisible, actualQuestion } = this.state;
 
     return (
       questionsGame.length !== 0 && (
@@ -144,12 +190,22 @@ class Game extends Component {
                 {isFetching ? (
                   <h1>Carregando...</h1>
                 ) : (
-                  <div>
+                  <div name="container">
                     <Header />
                     <Questions
-                      questions={ questionsGame[0] }
+                      questions={ questionsGame[actualQuestion] }
                       AnswersRandom={ randomAnswers }
+                      counterTime={ this.counterTime }
+
                     />
+                    { btnVisible && (
+                      <button
+                        type="button"
+                        data-testid="btn-next"
+                        onClick={ this.goToNextQuestion }
+                      >
+                        Next
+                      </button>) }
                   </div>
                 )}
               </div>
@@ -167,6 +223,7 @@ const mapStateToProps = (state) => ({
   timeOut: state.player.time,
   myTimer: state.player.myTimer,
   remaningTime: state.player.remaningTime,
+  secondsTimer: state.player.secondsTimer,
 });
 
 export default connect(mapStateToProps)(Game);
@@ -186,4 +243,5 @@ Game.propTypes = {
   timeOut: PropTypes.bool.isRequired,
   myTimer: PropTypes.number.isRequired,
   remaningTime: PropTypes.number.isRequired,
+  secondsTimer: PropTypes.number.isRequired,
 };

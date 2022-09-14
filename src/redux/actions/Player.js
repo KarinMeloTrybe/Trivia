@@ -4,6 +4,8 @@ export const CHANGE_IMAGE = 'CHANGE_IMAGE';
 export const TIME_OUT_USER = 'TIME_OUT_USER';
 export const REMANING_RESPONSE_TIME = 'REMANING_RESPONSE_TIME';
 export const ID_MY_TIMER = 'ID_MY_TIMER';
+export const CHANGE_TIMER = 'CHANGE_TIMER';
+export const RESTART_TIMER = 'RESTART_TIMER';
 
 export const scoreActions = (score) => ({
   type: CHANGE_SCORE,
@@ -28,4 +30,11 @@ export const remaningResponseTime = (time) => ({
 export const idMyTimer = (myTimer) => ({
   type: ID_MY_TIMER,
   myTimer,
+});
+
+export const changeTimer = () => ({
+  type: CHANGE_TIMER,
+});
+export const restartTimer = () => ({
+  type: RESTART_TIMER,
 });

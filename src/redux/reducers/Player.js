@@ -5,6 +5,8 @@ import {
   TIME_OUT_USER,
   REMANING_RESPONSE_TIME,
   ID_MY_TIMER,
+  CHANGE_TIMER,
+  RESTART_TIMER,
 } from '../actions/Player';
 
 const INITIAL_STATE = {
@@ -14,6 +16,7 @@ const INITIAL_STATE = {
   time: false,
   remaningTime: 0,
   myTimer: 0,
+  secondsTimer: 30,
 };
 const playerReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
@@ -47,6 +50,16 @@ const playerReducer = (state = INITIAL_STATE, action) => {
     return {
       ...state,
       myTimer: action.myTimer,
+    };
+  case CHANGE_TIMER:
+    return {
+      ...state,
+      secondsTimer: state.secondsTimer - 1,
+    };
+  case RESTART_TIMER:
+    return {
+      ...state,
+      secondsTimer: 30,
     };
   default:
     return state;

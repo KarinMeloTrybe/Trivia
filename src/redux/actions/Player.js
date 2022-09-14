@@ -6,10 +6,14 @@ export const REMANING_RESPONSE_TIME = 'REMANING_RESPONSE_TIME';
 export const ID_MY_TIMER = 'ID_MY_TIMER';
 export const CHANGE_TIMER = 'CHANGE_TIMER';
 export const RESTART_TIMER = 'RESTART_TIMER';
+export const CHANGE_ASSERTIONS = 'CHANGE_ASSERTIONS';
 
 export const scoreActions = (score) => ({
   type: CHANGE_SCORE,
   score,
+});
+export const changeAssertions = () => ({
+  type: CHANGE_ASSERTIONS,
 });
 
 export const loginActions = (login) => ({

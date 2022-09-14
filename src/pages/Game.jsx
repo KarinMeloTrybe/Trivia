@@ -1,17 +1,15 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import {
-  getFromLocalStorage,
-  removeFromLocalHistorage,
-} from '../service/localStorage';
+import { getFromLocalStorage, removeFromLocalHistorage } from '../service/localStorage';
 import { isFetchingAction, invalidTokenAction } from '../redux/actions/tokens';
 import getQuestionsFromAPI from '../service/getQuestionsFromAPI';
 import Header from '../components/Header';
 import Questions from '../components/Questions';
-import './Game.css';
-import { timeOutUser, scoreActions, restartTimer,
-  remaningResponseTime, idMyTimer, changeTimer } from '../redux/actions/Player';
+import { timeOutUser, scoreActions, restartTimer, remaningResponseTime,
+  idMyTimer, changeTimer, changeAssertions } from '../redux/actions/Player';
+
+const magicNumber = 4;
 
 class Game extends Component {
   state = {
@@ -73,27 +71,39 @@ class Game extends Component {
     }
   };
 
+  endGame = () => {
+    const { actualQuestion } = this.state;
+    const { history } = this.props;
+    if (actualQuestion === magicNumber) {
+      history.push('/feedback');
+    }
+  };
+
   goToNextQuestion = ({ target }) => {
-    const { questionsGame } = this.state;
+    const { questionsGame, actualQuestion } = this.state;
     const teste = target.parentNode.children[1].children[3];
     teste.className = '';
-    this.setState((prevState) => ({
-      actualQuestion: prevState.actualQuestion + 1,
-      btnVisible: false,
-    }), () => {
-      const { dispatch } = this.props;
-      dispatch(timeOutUser(false));
-      dispatch(restartTimer());
-      this.getElementsOfQuestion(questionsGame);
-      this.counterTime();
-    });
+    if (actualQuestion < magicNumber) {
+      this.setState((prevState) => ({
+        actualQuestion: prevState.actualQuestion + 1,
+        btnVisible: false,
+      }), () => {
+        const { dispatch } = this.props;
+        dispatch(timeOutUser(false));
+        dispatch(restartTimer());
+        this.getElementsOfQuestion(questionsGame);
+        this.counterTime();
+      });
+    }
+    this.endGame();
   };
 
   addColorOnClick = ({ target }) => {
     const { dispatch } = this.props;
     const teste = target.parentNode;
     teste.className = 'color-answers';
-    dispatch(scoreActions(this.handleScore(target)));
+    const score = this.handleScore(target);
+    dispatch(scoreActions(score));
     this.stopTime();
     this.setState({ btnVisible: true });
   };
@@ -104,12 +114,9 @@ class Game extends Component {
     const medium = 2;
     const hard = 3;
     switch (questionsGame[0].difficulty) {
-    case 'easy':
-      return easy;
-    case 'medium':
-      return medium;
-    case 'hard':
-      return hard;
+    case 'easy': return easy;
+    case 'medium': return medium;
+    case 'hard': return hard;
     default:
       return 0;
     }
@@ -121,11 +128,12 @@ class Game extends Component {
       clearInterval(myTimer);
       const { remaningTime } = this.props;
       const pointOfDifficulty = this.totalScore();
-      const magicNumber = 10;
+      const magicNumber1 = 10;
       const actualRemaningTime = Number(remaningTime) - 1;
       const pointsTotal = Number(
-        magicNumber + ((actualRemaningTime) * (pointOfDifficulty)),
+        magicNumber1 + ((actualRemaningTime) * (pointOfDifficulty)),
       );
+      dispatch(changeAssertions());
       return pointsTotal;
     }
     const points = 0;
@@ -166,18 +174,14 @@ class Game extends Component {
         {questions[actualQuestion].correct_answer}
       </button>,
     ];
-
     const sortValue = 0.5;
-
     const random = answerOptions.sort(() => Math.random() - sortValue);
-
     this.setState({ randomAnswers: random });
   };
 
   render() {
     const { isFetching, invalidToken } = this.props;
     const { questionsGame, randomAnswers, btnVisible, actualQuestion } = this.state;
-
     return (
       questionsGame.length !== 0 && (
         <div>
@@ -196,7 +200,6 @@ class Game extends Component {
                       questions={ questionsGame[actualQuestion] }
                       AnswersRandom={ randomAnswers }
                       counterTime={ this.counterTime }
-
                     />
                     { btnVisible && (
                       <button
@@ -216,7 +219,6 @@ class Game extends Component {
     );
   }
 }
-
 const mapStateToProps = (state) => ({
   isFetching: state.TokenReducer.isFetching,
   invalidToken: state.TokenReducer.invalidToken,

@@ -3,6 +3,8 @@ import { Switch, Route } from 'react-router-dom';
 import Login from './pages/Login';
 import Settings from './pages/Settings';
 import Game from './pages/Game';
+import Feedback from './pages/Feedback';
+import './pages/Game.css';
 
 export default class App extends React.Component {
   render() {
@@ -11,6 +13,7 @@ export default class App extends React.Component {
         <Route exact path="/" component={ Login } />
         <Route exact path="/settings" component={ Settings } />
         <Route exact path="/game" component={ Game } />
+        <Route exact path="/feedback" component={ Feedback } />
       </Switch>
     );
   }

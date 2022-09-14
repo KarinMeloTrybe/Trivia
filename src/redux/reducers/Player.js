@@ -7,6 +7,7 @@ import {
   ID_MY_TIMER,
   CHANGE_TIMER,
   RESTART_TIMER,
+  CHANGE_ASSERTIONS,
 } from '../actions/Player';
 
 const INITIAL_STATE = {
@@ -17,6 +18,8 @@ const INITIAL_STATE = {
   remaningTime: 0,
   myTimer: 0,
   secondsTimer: 30,
+  scoreTotal: 0,
+  assertions: 0,
 };
 const playerReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
@@ -24,6 +27,12 @@ const playerReducer = (state = INITIAL_STATE, action) => {
     return {
       ...state,
       score: action.score,
+      scoreTotal: action.score + state.scoreTotal,
+    };
+  case CHANGE_ASSERTIONS:
+    return {
+      ...state,
+      assertions: state.assertions + 1,
     };
   case CHANGE_LOGIN:
     return {
@@ -61,8 +70,7 @@ const playerReducer = (state = INITIAL_STATE, action) => {
       ...state,
       secondsTimer: 30,
     };
-  default:
-    return state;
+  default: return state;
   }
 };
 

@@ -18,7 +18,6 @@ const INITIAL_STATE = {
   remaningTime: 0,
   myTimer: 0,
   secondsTimer: 30,
-  scoreTotal: 0,
   assertions: 0,
 };
 const playerReducer = (state = INITIAL_STATE, action) => {
@@ -26,8 +25,7 @@ const playerReducer = (state = INITIAL_STATE, action) => {
   case CHANGE_SCORE:
     return {
       ...state,
-      score: action.score,
-      scoreTotal: action.score + state.scoreTotal,
+      score: action.score + state.score,
     };
   case CHANGE_ASSERTIONS:
     return {

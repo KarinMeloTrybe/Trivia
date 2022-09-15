@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { getTokenFromAPI } from '../redux/actions/tokens';
 import { saveToLocalStorage } from '../service/localStorage';
 import getFromAPI from '../service/getFromAPI';
-import { loginActions } from '../redux/actions/Player';
+import { loginActions, restartScore } from '../redux/actions/Player';
 
 class Login extends Component {
   state = {
@@ -12,6 +12,11 @@ class Login extends Component {
     email: '',
     isDisable: true,
   };
+
+  componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch(restartScore());
+  }
 
   handleValidation = () => {
     const { name, email } = this.state;

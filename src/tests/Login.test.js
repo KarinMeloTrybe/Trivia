@@ -5,7 +5,8 @@ import renderWithRouterAndRedux from './helpers/renderWithRouterAndRedux';
 import Login from '../pages/Login';
 import App from '../App';
 
-test('verifica se a rota chamada é a correta', () => {
+describe('teste a tela de Login',()=>{
+  test('verifica se a rota chamada é a correta', () => {
     const{history}=renderWithRouterAndRedux(<Login />);
     const correctPath = '/'
     expect(history.location.pathname).toBe(correctPath);
@@ -31,11 +32,11 @@ userEvent.type(inputEmail, Email);
 expect(playBtnValidation).toBeEnabled();
   });
   test('verifica se ao clicar no botão Play o usuário é redirecionado corretamente', async () => {
-  const token = {
-    "response_code":0,
-    "response_message":"Token Generated Successfully!",
-    "token":"f00cb469ce38726ee00a7c6836761b0a4fb808181a125dcde6d50a9f3c9127b6"
-  };
+  //const token = {
+   // "response_code":0,
+   // "response_message":"Token Generated Successfully!",
+   // "token":"f00cb469ce38726ee00a7c6836761b0a4fb808181a125dcde6d50a9f3c9127b6"
+  //};
     const{ history }=renderWithRouterAndRedux(<App />);
   const Email = 'test@email.com';
   const Name =  'Usuario';
@@ -46,9 +47,9 @@ expect(playBtnValidation).toBeEnabled();
   userEvent.type(inputName, Name);
   userEvent.type(inputEmail, Email);
   userEvent.click(playBtnValidation);
-  global.fetch = jest.fn().mockResolvedValue({
+  /* global.fetch = jest.fn().mockResolvedValue({
     json: jest.fn().mockResolvedValue(token),
-  });
+  }); */
   await waitFor(
     () => expect(history.location.pathname).toBe('/game'),
     { timeout: 3000 },
@@ -60,3 +61,5 @@ expect(playBtnValidation).toBeEnabled();
     userEvent.click(btnConfiguration);
       expect(history.location.pathname).toBe('/settings');
     });
+
+})
